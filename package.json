@@ -1,0 +1,18 @@
+{
+  "name": "cd-test",
+  "version": "1.0.0",
+  "description": "ci/cd test",
+  "main": "./src/index.js",
+  "scripts": {
+    "build": "rollup -c --bundleConfigAsCjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@rollup/plugin-babel": "^6.0.4",
+    "@rollup/plugin-commonjs": "^28.0.0",
+    "@rollup/plugin-node-resolve": "^15.3.0",
+    "rollup": "^4.24.0"
+  }
+}
