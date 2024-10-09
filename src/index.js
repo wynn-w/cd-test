@@ -1,5 +1,5 @@
 console.log('ready')
 (()=>{
-    console.log('hello world')
+    console.log('aaaaaaaaaa')
 })
 console.log('finish')
