@@ -52,7 +52,7 @@ jobs:
         VERSION=${GITHUB_REF##*/}
         VERSION=${VERSION#v} 
         echo "Version: $VERSION"
-        RELEASE_NOTES=$(awk "/## \\[$VERSION\\]/,/## \\[/ { if (!/## \\[/) print }" CHANGELOG.md)
+        RELEASE_NOTES=$(awk -v version="[$VERSION]" '$0 ~ version {found=1} found && $0 ~ /## \[/ {exit} found {print}' CHANGELOG.md)
         echo "release_notes<<EOF" >> $GITHUB_ENV
         echo "$RELEASE_NOTES" >> $GITHUB_ENV
         echo "EOF" >> $GITHUB_ENV
