@@ -50,5 +50,6 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         files: dist.zip
+        token:  ${{ secrets.NEW_CI_CD }}
       env:
         GITHUB_TOKEN: ${{ secrets.NEW_CI_CD }}
