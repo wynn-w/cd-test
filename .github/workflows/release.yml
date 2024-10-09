@@ -46,10 +46,24 @@ jobs:
       with:
         name: build-artifact
 
+    - name: Extract Release Notes
+      id: extract_notes
+      run: |
+        VERSION=${GITHUB_REF##*/}
+        echo "Version: $VERSION"
+        RELEASE_NOTES=$(awk "/## \\[$VERSION\\]/,/## \\[/ { if (!/## \\[/) print }" CHANGELOG.md)
+        echo "release_notes<<EOF" >> $GITHUB_ENV
+        echo "$RELEASE_NOTES" >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
+
     - name: Create Release
       uses: softprops/action-gh-release@v1
       with:
         files: dist.zip
         token:  ${{ secrets.NEW_CI_CD }}
+        release_name: Release ${{ github.ref }} 
+        body: |
+          ## 变更日志
+          ${{ env.release_notes }}
       env:
         GITHUB_TOKEN: ${{ secrets.NEW_CI_CD }}
