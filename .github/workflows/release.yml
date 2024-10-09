@@ -50,6 +50,7 @@ jobs:
       id: extract_notes
       run: |
         VERSION=${GITHUB_REF##*/}
+        VERSION=${VERSION#v} 
         echo "Version: $VERSION"
         RELEASE_NOTES=$(awk "/## \\[$VERSION\\]/,/## \\[/ { if (!/## \\[/) print }" CHANGELOG.md)
         echo "release_notes<<EOF" >> $GITHUB_ENV
