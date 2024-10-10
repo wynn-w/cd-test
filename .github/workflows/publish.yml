@@ -62,11 +62,12 @@ jobs:
       - name: Copy Artifacts and Release Notes to Publish Repository
         run: |
           VERSION="${{ env.VERSION }}"
-          RELEASE_NOTES=$(echo -e "## ${env.VERSION}   \n${env.RELEASE_NOTES}")
+          RELEASE_NOTES="${{env.RELEASE_NOTES}}"
+          MIX_RELEASE_NOTES=$(echo -e "## $VERSION   \n$RELEASE_NOTES")
 
           mkdir -p release-repo/releases/$VERSION
 
-          printf "$RELEASE_NOTES" > release-repo/releases/$VERSION/RELEASE_NOTES.txt
+          printf "$MIX_RELEASE_NOTES" > release-repo/releases/$VERSION/RELEASE_NOTES.txt
 
           cp artifacts/artifact-$VERSION.zip release-repo/releases/$VERSION/
 
