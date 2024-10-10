@@ -1,0 +1,76 @@
+name: Publish Release to Publish Repository
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build Project
+        run: npm run build
+
+      - name: Extract Version and Release Notes
+        id: extract_info
+        run: |
+          VERSION=${GITHUB_REF##*/}
+          VERSION=${VERSION#v} 
+
+          RELEASE_NOTES=$(awk -v ver="$VERSION" '$0 ~ "^## \\[" ver "\\]" { flag=1; next } $0 ~ "^## \\[" { flag=0 } flag' CHANGELOG.md)
+          echo "release_notes<<EOF" >> $GITHUB_ENV
+          echo "$RELEASE_NOTES" >> $GITHUB_ENV
+          echo "version<<EOF" >> $GITHUB_ENV
+          echo "$VERSION" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Prepare Artifact
+        run: |
+          mkdir -p artifacts
+          cp -r dist/* artifacts/
+          zip -r artifacts/artifact-$VERSION.zip artifacts/
+
+      - name: Checkout Release Publish Repository
+        uses: actions/checkout@v3
+        with:
+          repository: wynn-w/release-test
+          token: ${{ secrets.NEW_CI_CD }}
+          path: release-test
+
+      - name: Copy Artifacts and Release Notes to Publish Repository
+        run: |
+          VERSION="${{ env.version }}"
+          RELEASE_NOTES="${{ env.release_notes }}"
+
+          mkdir -p release-repo/releases/$VERSION
+
+          echo "$RELEASE_NOTES" > release-repo/releases/$VERSION/RELEASE_NOTES.txt
+
+          cp artifacts/artifact-$VERSION.zip release-repo/releases/$VERSION/
+
+          cd release-test
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add releases/$VERSION/
+
+          git commit -m "release: version $VERSION"
+
+      - name: Push Changes to Publish Repository
+        run: |
+          cd release-repo
+          git push origin release
