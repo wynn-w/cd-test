@@ -67,7 +67,7 @@ jobs:
 
           mkdir -p release-repo/releases/$VERSION
 
-          printf "$MIX_RELEASE_NOTES" > release-repo/releases/$VERSION/RELEASE_NOTES.txt
+          printf "$MIX_RELEASE_NOTES" > release-repo/releases/$VERSION/RELEASE_NOTES.md
 
           cp artifacts/artifact-$VERSION.zip release-repo/releases/$VERSION/
 
