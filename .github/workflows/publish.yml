@@ -82,3 +82,15 @@ jobs:
         run: |
           cd release-repo
           git push origin master
+          - name: Upload Release Asset to Publish Repository
+          uses: actions/upload-release-asset@v1
+          with:
+            upload_url: ${{ steps.create_release.outputs.upload_url }}
+            asset_path: ./artifacts/artifact-${{ env.VERSION }}.zip
+            asset_name: artifact-${{ env.VERSION }}.zip
+            asset_content_type: application/zip
+            body: body: |
+                ## 变更日志
+                ${{ env.RELEASE_NOTES }}
+          env:
+            GITHUB_TOKEN: ${{ secrets.NEW_CI_CD }}
