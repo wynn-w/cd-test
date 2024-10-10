@@ -62,10 +62,7 @@ jobs:
       - name: Copy Artifacts and Release Notes to Publish Repository
         run: |
           VERSION="${{ env.VERSION }}"
-          RELEASE_NOTES=
-          "##${{env.VERSION}}   
-          ${{ env.RELEASE_NOTES }}
-          "
+          RELEASE_NOTES=$(echo -e "## ${env.VERSION}   \n${env.RELEASE_NOTES}")
 
           mkdir -p release-repo/releases/$VERSION
 
