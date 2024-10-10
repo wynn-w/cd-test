@@ -1,5 +1,5 @@
 console.log('ready')
 (()=>{
-    console.log('aaaaaaaaaa')
+    console.log('next level')
 })
 console.log('finish')
