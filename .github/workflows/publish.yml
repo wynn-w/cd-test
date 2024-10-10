@@ -64,11 +64,11 @@ jobs:
           VERSION="${{ env.version }}"
           RELEASE_NOTES="${{ env.release_notes }}"
 
-          mkdir -p release-repo/releases/$VERSION
+          mkdir -p release-test/releases/$VERSION
 
-          echo "$RELEASE_NOTES" > release-repo/releases/$VERSION/RELEASE_NOTES.txt
+          echo "$RELEASE_NOTES" > release-test/releases/$VERSION/RELEASE_NOTES.txt
 
-          cp artifacts/artifact-$VERSION.zip release-repo/releases/$VERSION/
+          cp artifacts/artifact-$VERSION.zip release-test/releases/$VERSION/
 
           cd release-test
 
@@ -81,5 +81,5 @@ jobs:
 
       - name: Push Changes to Publish Repository
         run: |
-          cd release-repo
+          cd release-test
           git push origin release
