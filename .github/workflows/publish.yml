@@ -40,11 +40,11 @@ jobs:
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
           RELEASE_NOTES=$(awk -v ver="$VERSION" '$0 ~ "^## \\[" ver "\\]" { flag=1; next } $0 ~ "^## \\[" { flag=0 } flag' CHANGELOG.md)
+          
+          echo "RELEASE_NOTES<<EOF" >> $GITHUB_ENV
           echo "$RELEASE_NOTES" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
-          echo "RELEASE_NOTES=${RELEASE_NOTES}"
-          
-
+              
       - name: Prepare Artifact
         run: |
           mkdir -p artifacts
