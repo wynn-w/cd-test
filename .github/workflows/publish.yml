@@ -35,12 +35,14 @@ jobs:
       - name: Extract Version and Release Notes
         id: extract_info
         run: |
-          VERSION=${GITHUB_REF##*/}
-          VERSION=${VERSION#v} 
-
+          VERSION="${GITHUB_REF##*/}"
+          VERSION="${VERSION#v}"
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
           RELEASE_NOTES=$(awk -v ver="$VERSION" '$0 ~ "^## \\[" ver "\\]" { flag=1; next } $0 ~ "^## \\[" { flag=0 } flag' CHANGELOG.md)
+          RELEASE_NOTES="${RELEASE_NOTES//\\/\\\\}" 
+          RELEASE_NOTES="${RELEASE_NOTES//$'\n'/\\n}" 
+
           echo "RELEASE_NOTES=$RELEASE_NOTES" >> $GITHUB_ENV
           
 
