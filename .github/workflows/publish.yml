@@ -38,12 +38,11 @@ jobs:
           VERSION=${GITHUB_REF##*/}
           VERSION=${VERSION#v} 
 
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
           RELEASE_NOTES=$(awk -v ver="$VERSION" '$0 ~ "^## \\[" ver "\\]" { flag=1; next } $0 ~ "^## \\[" { flag=0 } flag' CHANGELOG.md)
-          echo "release_notes<<EOF" >> $GITHUB_ENV
-          echo "$RELEASE_NOTES" >> $GITHUB_ENV
-          echo "version<<EOF" >> $GITHUB_ENV
-          echo "$VERSION" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          echo "RELEASE_NOTES=$RELEASE_NOTES" >> $GITHUB_ENV
+          
 
       - name: Prepare Artifact
         run: |
@@ -61,8 +60,8 @@ jobs:
 
       - name: Copy Artifacts and Release Notes to Publish Repository
         run: |
-          VERSION="${{ env.version }}"
-          RELEASE_NOTES="${{ env.release_notes }}"
+          VERSION="${{ env.VERSION }}"
+          RELEASE_NOTES="##${{env.VERSION}} \n${{ env.RELEASE_NOTES }}"
 
           mkdir -p release-repo/releases/$VERSION
 
