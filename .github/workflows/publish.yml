@@ -63,7 +63,10 @@ jobs:
       - name: Copy Artifacts and Release Notes to Publish Repository
         run: |
           VERSION="${{ env.VERSION }}"
-          RELEASE_NOTES="##${{env.VERSION}} \n${{ env.RELEASE_NOTES }}"
+          RELEASE_NOTES=
+          "##${{env.VERSION}}   
+          ${{ env.RELEASE_NOTES }}
+          "
 
           mkdir -p release-repo/releases/$VERSION
 
@@ -91,8 +94,6 @@ jobs:
             asset_path: ./artifacts/artifact-${{ env.VERSION }}.zip
             asset_name: artifact-${{ env.VERSION }}.zip
             asset_content_type: application/zip
-            body: body: |
-                ## 变更日志
-                ${{ env.RELEASE_NOTES }}
+            
           env:
             GITHUB_TOKEN: ${{ secrets.NEW_CI_CD }}
