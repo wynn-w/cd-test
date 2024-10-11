@@ -32,13 +32,24 @@ jobs:
       - name: Build Project
         run: npm run build
 
-
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifact
+          path: ./dist
+    
   release:
     needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: build-artifact
+          path: ./dist
 
       - name: Extract Version and Release Notes
         id: extract_info
@@ -55,9 +66,8 @@ jobs:
 
       - name: Prepare Artifact
         run: |
-          mkdir -p artifacts
-          cp -r dist/* artifacts/
-          zip -r artifacts/artifact-$VERSION.zip artifacts/
+          cd dist
+          zip -r artifact-$VERSION.zip ./* 
 
       - name: Create Release in Target Repo
         env:
@@ -68,4 +78,4 @@ jobs:
             --repo $TARGET_REPO \
             --title "Release ${{ env.VERSION }}" \
             --notes ${{env.RELEASE_NOTES}})
-            gh release upload ${{ env.VERSION }} artifacts/artifact-$VERSION.zip --repo $TARGET_REPO
+            gh release upload ${{ env.VERSION }} artifact-$VERSION.zip --repo $TARGET_REPO
