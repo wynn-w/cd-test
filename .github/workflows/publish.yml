@@ -64,6 +64,10 @@ jobs:
           echo "$RELEASE_NOTES" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
+      - name: Extract Version and Release Notes
+        run: echo "${{env.RELEASE_NOTES}}" > RELEASE_NOTES.md
+
+
       - name: Prepare Artifact
         run: |
           cd dist
@@ -77,5 +81,5 @@ jobs:
             RELEASE_ID=$(gh release create ${{ env.VERSION }} \
             --repo $TARGET_REPO \
             --title "Release ${{ env.VERSION }}" \
-            --notes ${{env.RELEASE_NOTES}})
+            --notes-file RELEASE_NOTES.md)
             gh release upload ${{ env.VERSION }} artifact-$VERSION.zip --repo $TARGET_REPO
