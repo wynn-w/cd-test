@@ -6,7 +6,7 @@ on:
       - 'v*.*.*'
 
 jobs:
-  build-and-publish:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -32,6 +32,11 @@ jobs:
       - name: Build Project
         run: npm run build
 
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
       - name: Extract Version and Release Notes
         id: extract_info
         run: |
@@ -44,7 +49,7 @@ jobs:
           echo "RELEASE_NOTES<<EOF" >> $GITHUB_ENV
           echo "$RELEASE_NOTES" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
-              
+
       - name: Prepare Artifact
         run: |
           mkdir -p artifacts
@@ -52,47 +57,15 @@ jobs:
           zip -r artifacts/artifact-$VERSION.zip artifacts/
 
       - name: Checkout Release Publish Repository
-        uses: actions/checkout@v3
-        with:
-          repository: wynn-w/release-test
-          branch: master
-          token: ${{ secrets.NEW_CI_CD }}
-          path: release-repo
+        uses: actions/checkout@v2
 
-      - name: Copy Artifacts and Release Notes to Publish Repository
-        run: |
-          VERSION="${{ env.VERSION }}"
-          RELEASE_NOTES="${{env.RELEASE_NOTES}}"
-          MIX_RELEASE_NOTES=$(echo -e "## $VERSION   \n$RELEASE_NOTES")
-
-          mkdir -p release-repo/releases/$VERSION
-
-          printf "$MIX_RELEASE_NOTES" > release-repo/releases/$VERSION/RELEASE_NOTES.md
-
-          cp artifacts/artifact-$VERSION.zip release-repo/releases/$VERSION/
-
-          cd release-repo
-
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          git add releases/$VERSION/
-
-          git commit -m "release: version $VERSION"
-
-      - name: Push Changes to Publish Repository
-        run: |
-          cd release-repo
-          git tag v${{ env.VERSION }}
-          git push origin master v${{ env.VERSION }}
-
-      - name: Create Release in Release Repository
-        uses: softprops/action-gh-release@v1
-        with:
-            tag_name: v${{ env.VERSION }}
-            release_name: Release v${{ env.VERSION }}
-            body: ${{ env.RELEASE_NOTES }}
-            files: ./artifacts/artifact-${{ env.VERSION }}.zip
-            repository: wynn-w/release-test
+      - name: Create Release in Target Repo
         env:
-            GITHUB_TOKEN: ${{ secrets.RELEASE_REPO_TOKEN }}
+            GH_TOKEN: ${{ secrets.NEW_CI_CD }}
+            TARGET_REPO: wynn-w/release-test
+        run: |
+            RELEASE_ID=$(gh release create ${{ env.VERSION }} \
+            --repo $TARGET_REPO \
+            --title "Release ${{ env.VERSION }}" \
+            --notes ${{env.RELEASE_NOTES}})
+            gh release upload ${{ env.VERSION }} artifacts/artifact-$VERSION.zip --repo $TARGET_REPO
