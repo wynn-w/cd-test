@@ -98,11 +98,7 @@ jobs:
           body: ${{ env.RELEASE_NOTES }}
           draft: false
           prerelease: false
-          run: |
-            VERSION="${{ env.VERSION }}"
-            RELEASE_NOTES="${{env.RELEASE_NOTES}}"
-            echo "$VERSION"
-            echo "$RELEASE_NOTES"
+          repository: wynn-w/release-test
             
       - name: Upload Release Asset to Publish Repository
         uses: actions/upload-release-asset@v1
