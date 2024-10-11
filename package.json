@@ -1,6 +1,6 @@
 {
   "name": "cd-test",
-  "version": "1.2.7",
+  "version": "1.2.8",
   "description": "ci/cd test",
   "main": "./src/index.js",
   "scripts": {
