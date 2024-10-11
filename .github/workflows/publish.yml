@@ -83,7 +83,8 @@ jobs:
       - name: Push Changes to Publish Repository
         run: |
           cd release-repo
-          git push origin master
+          git tag v${{ env.VERSION }}
+          git push origin master v${{ env.VERSION }}
 
     
       - name: Create Release
