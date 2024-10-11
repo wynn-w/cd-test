@@ -86,26 +86,13 @@ jobs:
           git tag v${{ env.VERSION }}
           git push origin master v${{ env.VERSION }}
 
-    
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.NEW_CI_CD }}
+      - name: Create Release in Release Repository
+        uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ env.VERSION }}
-          release_name: Release ${{ env.VERSION }}
-          body: ${{ env.RELEASE_NOTES }}
-          draft: false
-          prerelease: false
-          repository: wynn-w/release-test
-            
-      - name: Upload Release Asset to Publish Repository
-        uses: actions/upload-release-asset@v1
-        with:
-            upload_url: ${{ steps.create_release.outputs.upload_url }}
-            asset_path: ./artifacts/artifact-${{ env.VERSION }}.zip
-            asset_name: artifact-${{ env.VERSION }}.zip
-            asset_content_type: application/zip
+            tag_name: v${{ env.VERSION }}
+            release_name: Release v${{ env.VERSION }}
+            body: ${{ env.RELEASE_NOTES }}
+            files: ./artifacts/artifact-${{ env.VERSION }}.zip
+            repository: wynn-w/release-test
         env:
-            GITHUB_TOKEN: ${{ secrets.NEW_CI_CD }}
+            GITHUB_TOKEN: ${{ secrets.RELEASE_REPO_TOKEN }}
