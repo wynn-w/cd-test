@@ -4,6 +4,9 @@ on:
   push:
     tags:
       - 'v*.*.*'
+    branches:
+      - master
+      - main
 
 jobs:
   build:
@@ -64,23 +67,32 @@ jobs:
           echo "$RELEASE_NOTES" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
+      - name: Set REPO_NAME
+        run: |
+            if [ -z "${{ secrets.PUB_REPO_NAME }}" ]; then
+              REPO_NAME=${GITHUB_REPOSITORY#*/}
+            else 
+              REPO_NAME="${{ secrets.PUB_REPO_NAME }}"
+            fi  
+            echo "REPO_NAME=$REPO_NAME" >> $GITHUB_ENV
+
       - name: Extract Version and Release Notes
         run: echo "${{env.RELEASE_NOTES}}" > RELEASE_NOTES.md
 
-
+    
       - name: Prepare Artifact
         run: |
           cd dist
-          zip -r ../artifact-$VERSION.zip ./* 
+          zip -r ../$REPO_NAME-$VERSION.zip ./* 
           cd ../
 
-      - name: Create Release in Target Repo
+      - name: Create Release to Publish Repository
         env:
             GH_TOKEN: ${{ secrets.NEW_CI_CD }}
-            TARGET_REPO: wynn-w/release-test
+            TARGET_REPO: ${{ secrets.PUB_REPO_NAME }}
         run: |
             RELEASE_ID=$(gh release create ${{ env.VERSION }} \
             --repo $TARGET_REPO \
             --title "Release ${{ env.VERSION }}" \
             --notes-file RELEASE_NOTES.md)
-            gh release upload ${{ env.VERSION }} artifact-$VERSION.zip --repo $TARGET_REPO
+            gh release upload ${{ env.VERSION }} $REPO_NAME-$VERSION.zip --repo $TARGET_REPO
