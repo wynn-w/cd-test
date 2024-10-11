@@ -71,7 +71,8 @@ jobs:
       - name: Prepare Artifact
         run: |
           cd dist
-          zip -r artifact-$VERSION.zip ./* 
+          zip -r ../artifact-$VERSION.zip ./* 
+          cd ../
 
       - name: Create Release in Target Repo
         env:
