@@ -89,7 +89,7 @@ jobs:
       - name: Create Release to Publish Repository
         env:
             GH_TOKEN: ${{ secrets.NEW_CI_CD }}
-            TARGET_REPO: ${{ secrets.PUB_REPO_NAME }}
+            TARGET_REPO: ${{ vars.PUB_REPO_NAME }}
         run: |
             RELEASE_ID=$(gh release create ${{ env.VERSION }} \
             --repo $TARGET_REPO \
